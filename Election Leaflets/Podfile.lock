@@ -1,0 +1,20 @@
+
+DEPENDENCIES: 
+- AFNetworking (~> 1.1.0)
+- HockeySDK (~> 3.0.0)
+- Nimbus/NetworkImage (~> 1.0.0)
+
+PODS: 
+- AFNetworking (1.1.0)
+- HockeySDK (3.0.0)
+- Nimbus/Core (1.0.0)
+- Nimbus/NetworkImage (1.0.0): 
+  - Nimbus/Core
+
+COCOAPODS: 0.16.1
+
+SPEC CHECKSUMS: 
+  AFNetworking: 761a418233d280c1e0580bcb76ff9cb4c3073d17
+  Nimbus/Core: 196175ecaddf4e88925c9e0441aa58e4e40a2b89
+  Nimbus/NetworkImage: 196175ecaddf4e88925c9e0441aa58e4e40a2b89
+  HockeySDK: ffb5d1bc7b6fef6a2ffd7a614504665c377607e8
