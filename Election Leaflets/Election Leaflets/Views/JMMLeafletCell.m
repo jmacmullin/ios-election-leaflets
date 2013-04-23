@@ -47,7 +47,8 @@
 
 - (void)prepareForReuse
 {
-    [self.imageView prepareForReuse];
+    [super prepareForReuse];
+    [self.leafletImageView prepareForReuse];
 }
 
 #pragma mark - KVO
@@ -56,11 +57,11 @@
 {
     if ([keyPath isEqualToString:@"leaflet"]) {
         [self.publishedByLabel setText:self.leaflet.publishedBy];
-        [self.imageView setPathToNetworkImage:self.leaflet.imageURL.absoluteString];
-        [self.imageView setDelegate:self];
+        [self.leafletImageView setPathToNetworkImage:self.leaflet.imageURL.absoluteString
+                                      forDisplaySize:CGSizeMake(280.0, 280.0)
+                                         contentMode:UIViewContentModeScaleAspectFill];
+        [self.leafletImageView setDelegate:self];
         [self.titleLabel setText:self.leaflet.title];
-        
-        NSLog(@"%@", self.leaflet.imageURL.absoluteString);
     }
 }
 
@@ -68,14 +69,10 @@
 
 - (void)networkImageView:(NINetworkImageView *)imageView didFailWithError:(NSError *)error
 {
-    NSLog(@"fail! - %@", error);
 }
 
 - (void)networkImageView:(NINetworkImageView *)imageView didLoadImage:(UIImage *)image
 {
-    NSLog(@"did load!");
-    [self.imageView setHidden:NO];
-    [self.publishedByLabel setHidden:YES];
 }
 
 @end

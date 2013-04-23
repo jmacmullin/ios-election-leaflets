@@ -17,6 +17,6 @@
 
 @property (nonatomic, strong) IBOutlet UILabel *publishedByLabel;
 @property (nonatomic, strong) IBOutlet UILabel *titleLabel;
-@property (nonatomic, strong) IBOutlet NINetworkImageView *imageView;
+@property (nonatomic, strong) IBOutlet NINetworkImageView *leafletImageView;
 
 @end
