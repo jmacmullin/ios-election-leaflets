@@ -6,10 +6,12 @@
 //  Copyright (c) 2013 Jake MacMullin. All rights reserved.
 //
 
+#import <QuartzCore/QuartzCore.h>
 #import "JMMLeafletCell.h"
 
 @interface JMMLeafletCell()
 - (void)initialise;
+@property (nonatomic, strong) CALayer *contentLayer;
 @end
 
 @implementation JMMLeafletCell
@@ -48,6 +50,14 @@
 - (void)prepareForReuse
 {
     [super prepareForReuse];
+    
+    if (self.contentLayer==nil) {
+        [self setContentLayer:self.leafletContentView.layer];
+        [self.contentLayer setBorderWidth:1.0];
+        [self.contentLayer setBorderColor:[UIColor lightGrayColor].CGColor];
+        [self.contentLayer setCornerRadius:3.0];
+    }
+    
     [self.leafletImageView prepareForReuse];
 }
 

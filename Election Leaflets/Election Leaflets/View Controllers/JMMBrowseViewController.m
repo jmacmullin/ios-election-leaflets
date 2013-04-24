@@ -38,6 +38,8 @@
            forKeyPath:@"leaflets"
               options:NSKeyValueObservingOptionNew
               context:NULL];
+    [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"browse_icon_selected"]
+                  withFinishedUnselectedImage:[UIImage imageNamed:@"browse_icon"]];
 }
 
 - (void)viewDidLoad
