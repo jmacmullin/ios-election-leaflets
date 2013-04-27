@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface JMMUploadViewController : UIViewController
+@interface JMMUploadViewController : UITableViewController <UIImagePickerControllerDelegate>
+
+@property (nonatomic, strong) UIImagePickerController * imagePickerController;
+@property (nonatomic, strong) id <UIImagePickerControllerDelegate> delegate;
 
 @end
