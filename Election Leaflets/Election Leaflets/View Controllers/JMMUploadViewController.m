@@ -5,7 +5,7 @@
 //  Created by Jake MacMullin on 24/04/13.
 //  Copyright (c) 2013 Jake MacMullin. All rights reserved.
 //
-
+#import <QuartzCore/QuartzCore.h>
 #import "JMMUploadViewController.h"
 #import "UploadPictureCell.h"
 
@@ -16,9 +16,10 @@
 //Toolbar actions
 - (IBAction)photoLibraryAction:(id)sender;
 - (IBAction)cameraAction:(id)sender;
+- (IBAction)uploadImagesAction:(id)sender;
 
 //Table View
-@property (nonatomic, strong) UITableView *originalTableView;
+@property (weak, nonatomic) IBOutlet UIButton *uploadImagesButton;
 
 @end
 
@@ -27,7 +28,6 @@
 @synthesize imagePickerController;
 @synthesize capturedImages;
 @synthesize delegate;
-@synthesize originalTableView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -50,18 +50,24 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    
     if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
     {
         // if camera is not on this device, don't show the camera button
         self.navigationItem.rightBarButtonItem = nil;
     }
-    
     self.imagePickerController = [[UIImagePickerController alloc] init];
     self.imagePickerController.delegate = self;
     self.capturedImages = [NSMutableArray array];
+    [[self.uploadImagesButton superview] setHidden:YES]; //hide the upload button until pictures are selected
 }
+
+- (void)showUploadButton
+{
+    self.uploadImagesButton.layer.cornerRadius = 3;
+    self.uploadImagesButton.layer.backgroundColor = [[UIColor redColor] CGColor];
+    [[self.uploadImagesButton superview] setHidden:NO];
+}
+
 
 
 - (void)didReceiveMemoryWarning
@@ -69,7 +75,7 @@
     [super didReceiveMemoryWarning];
 }
 
-#pragma mark Toolbar Actions
+#pragma mark Actions
 
 - (void)showImagePicker:(UIImagePickerControllerSourceType)sourceType
 {
@@ -99,6 +105,10 @@
     [self showImagePicker:UIImagePickerControllerSourceTypeCamera];
 }
 
+- (IBAction)uploadImagesAction:(id)sender {
+    //Add upload images code here
+}
+
 #pragma mark UIImagePickerController Delegate
 
 -(void) imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
@@ -126,8 +136,10 @@
         count = [self.capturedImages count];
     }
     if (count == 0) {
+        [[self.uploadImagesButton superview] setHidden:YES]; //no images selected therefore hide upload button
         return 1; //the instructions cell will be displayed
     } else {
+        [self showUploadButton]; //images selected therefore show upload button
         return count;
     }
 }

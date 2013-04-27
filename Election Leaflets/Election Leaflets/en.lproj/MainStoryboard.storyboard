@@ -32,6 +32,25 @@
                         <rect key="frame" x="0.0" y="64" width="320" height="455"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
+                        <view key="tableFooterView" contentMode="scaleToFill" id="cCb-aA-wvS">
+                            <rect key="frame" x="0.0" y="827" width="320" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="vnb-9Q-Y6c">
+                                    <rect key="frame" x="50" y="5" width="220" height="35"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" name="Helvetica-Bold" family="Helvetica" pointSize="15"/>
+                                    <state key="normal" title="Upload Images">
+                                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="uploadImagesAction:" destination="ryK-EA-eGa" eventType="touchUpInside" id="kaq-4Q-5Cv"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <color key="backgroundColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
+                        </view>
                         <prototypes>
                             <tableViewCell autoresizesSubviews="NO" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="UploadPictureCell" rowHeight="350" id="K2t-fJ-NHL" customClass="UploadPictureCell">
                                 <rect key="frame" x="0.0" y="22" width="320" height="350"/>
@@ -100,6 +119,9 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="uploadImagesButton" destination="vnb-9Q-Y6c" id="HQh-NA-5pS"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kO0-hb-8PT" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -272,6 +294,8 @@
             <relationships>
                 <relationship kind="action" name="cameraAction:"/>
                 <relationship kind="action" name="photoLibraryAction:"/>
+                <relationship kind="action" name="uploadImagesAction:"/>
+                <relationship kind="outlet" name="uploadImagesButton" candidateClass="UIButton"/>
             </relationships>
         </class>
         <class className="NINetworkImageView" superclassName="UIImageView">
