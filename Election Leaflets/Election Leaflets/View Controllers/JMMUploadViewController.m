@@ -63,8 +63,31 @@
 
 - (void)showUploadButton
 {
-    self.uploadImagesButton.layer.cornerRadius = 3;
-    self.uploadImagesButton.layer.backgroundColor = [[UIColor redColor] CGColor];
+    
+    // Set the button Text Color
+    [self.uploadImagesButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [self.uploadImagesButton setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
+    
+    // Set default backgrond color
+    [self.uploadImagesButton setBackgroundColor:[UIColor blackColor]];
+    
+    // Draw a custom gradient
+    CAGradientLayer *btnGradient = [CAGradientLayer layer];
+    btnGradient.frame = self.uploadImagesButton.bounds;
+    btnGradient.colors = [NSArray arrayWithObjects:
+                          (id)[[UIColor colorWithRed:102.0f / 255.0f green:102.0f / 255.0f blue:102.0f / 255.0f alpha:1.0f] CGColor],
+                          (id)[[UIColor colorWithRed:51.0f / 255.0f green:51.0f / 255.0f blue:51.0f / 255.0f alpha:1.0f] CGColor],
+                          nil];
+    [self.uploadImagesButton.layer insertSublayer:btnGradient atIndex:0];
+    
+    // Round button corners
+    CALayer *btnLayer = [self.uploadImagesButton layer];
+    [btnLayer setMasksToBounds:YES];
+    [btnLayer setCornerRadius:5.0f];
+    
+    // Apply a 1 pixel, black border around button
+    [btnLayer setBorderWidth:1.0f];
+    [btnLayer setBorderColor:[[UIColor blackColor] CGColor]];
     [[self.uploadImagesButton superview] setHidden:NO];
 }
 
@@ -193,7 +216,11 @@
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return YES;
+    if ([self.capturedImages count] > 0) {
+        return YES;
+    } else {
+        return NO;
+    }
 }
 
 // Override to support editing the table view.
