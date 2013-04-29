@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 Jake MacMullin. All rights reserved.
 //
 #import <QuartzCore/QuartzCore.h>
+#import <AFNetworking/AFHTTPClient.h>
+#import <AFNetworking/AFHTTPRequestOperation.h>
 #import "JMMUploadViewController.h"
 #import "UploadPictureCell.h"
 
@@ -18,8 +20,11 @@
 - (IBAction)cameraAction:(id)sender;
 - (IBAction)uploadImagesAction:(id)sender;
 
-//Table View
+//Upload Button
 @property (weak, nonatomic) IBOutlet UIButton *uploadImagesButton;
+
+//Uploading In Progress View
+@property (strong, nonatomic) UIAlertView *uploadingInProgressView;
 
 @end
 
@@ -28,6 +33,8 @@
 @synthesize imagePickerController;
 @synthesize capturedImages;
 @synthesize delegate;
+@synthesize uploadingInProgressView;
+@synthesize uploadedImagesKey;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -129,7 +136,97 @@
 }
 
 - (IBAction)uploadImagesAction:(id)sender {
-    //Add upload images code here
+    [self displayUploadingInProgressMessage];
+    [self startImageUploadRequests];
+}
+
+#pragma mark Netowrking for Upload of Images
+
+-(void) startImageUploadRequests
+{
+    NSURL *url = [NSURL URLWithString:@"http://www.electionleaflets.org.au/"];
+    AFHTTPClient *httpClient = [[AFHTTPClient alloc] initWithBaseURL:url];
+    NSMutableURLRequest *request = [httpClient requestWithMethod:@"GET" path:@"addupload" parameters:nil];
+    AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+        //Extract the view state and call uploadImagesToUrlwithViewStateMethod
+        NSString *htmlString = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
+        NSRange extractionRange = [htmlString rangeOfString:@"\"_viewstate\" value=\""];
+        extractionRange.location = extractionRange.location + extractionRange.length; //start from the end of the search string
+        extractionRange.length = 88; //assume view state is always 88 characters long
+        NSString *viewState = [htmlString substringWithRange:extractionRange];
+        [self uploadImagesToUrl:url withViewState:viewState];
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"Error occured whilst making initial HTTP request");
+        [self.uploadingInProgressView dismissWithClickedButtonIndex:0 animated:YES];
+        [self displayUploadErrorMessage];
+    }];
+    [httpClient enqueueHTTPRequestOperation:operation];
+}
+
+-(void) uploadImagesToUrl:(NSURL *)imageUploadURL withViewState:(NSString *)viewState
+{
+    AFHTTPClient *httpClient = [[AFHTTPClient alloc] initWithBaseURL:imageUploadURL];
+    NSDictionary *params = @{@"_is_postback": @"1",
+                             @"_viewstate": viewState,
+                             @"_postback_command": @"",
+                             @"_postback_arguement":@"",
+                             @"MAX_FILE_SIZE": @"10000000000"
+                             };
+    NSMutableURLRequest *request = [httpClient multipartFormRequestWithMethod:@"POST" path:@"addupload" parameters:params constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
+        for (UIImage *image in self.capturedImages){
+            NSData *imageData = UIImageJPEGRepresentation(image, 0.5);
+            NSString *imageNumberString = [NSString stringWithFormat:@"%d", [self.capturedImages indexOfObject:image]+1];
+            NSString *imageName = [@"uplFile_" stringByAppendingString:imageNumberString];
+            NSString *imageFilename = [[@"image" stringByAppendingString:imageNumberString] stringByAppendingString:@".jpg"];
+            [formData appendPartWithFileData:imageData name:imageName fileName:imageFilename mimeType:@"image/jpeg"];
+        }
+    }];
+    AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+    [operation setUploadProgressBlock:^(NSUInteger bytesWritten, long long totalBytesWritten, long long totalBytesExpectedToWrite) {
+        NSLog(@"Sent %lld of %lld bytes", totalBytesWritten, totalBytesExpectedToWrite);
+    }];
+    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSString *locationString = [[operation.response allHeaderFields] objectForKey:@"x-url"];
+        NSRange keyRange = [locationString rangeOfString:@"key="];
+        keyRange.location = keyRange.location + keyRange.length;
+        keyRange.length = [locationString length] - keyRange.location;
+        self.uploadedImagesKey = [locationString substringWithRange:keyRange];
+        NSLog(@"Sucess Occurred");
+        [self.uploadingInProgressView dismissWithClickedButtonIndex:0 animated:YES];
+        [self performSegueWithIdentifier:@"imagesUploadedSegue" sender:self];
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"Failure occured on POST request");
+        [self.uploadingInProgressView dismissWithClickedButtonIndex:0 animated:YES];
+        [self displayUploadErrorMessage];
+    }];
+    [httpClient enqueueHTTPRequestOperation:operation];
+}
+
+#pragma mark Networking Messages to User
+
+-(void) displayUploadErrorMessage
+{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Upload Error"
+                                                    message:@"An error occured, please try again."
+                                                   delegate:self
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil];
+    [alert show];
+}
+
+-(void) displayUploadingInProgressMessage
+{
+    self.uploadingInProgressView = [[UIAlertView alloc] initWithTitle:@"\nUploading Images\nPlease Wait..."
+                                                message:nil
+                                               delegate:self
+                                      cancelButtonTitle:nil
+                                      otherButtonTitles: nil];
+    [self.uploadingInProgressView show];
+    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    indicator.center = CGPointMake(self.uploadingInProgressView.bounds.size.width / 2, self.uploadingInProgressView.bounds.size.height - 50);
+    [indicator startAnimating];
+    [self.uploadingInProgressView addSubview:indicator];
 }
 
 #pragma mark UIImagePickerController Delegate
