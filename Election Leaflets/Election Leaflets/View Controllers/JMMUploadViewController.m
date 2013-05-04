@@ -136,8 +136,10 @@
 }
 
 - (IBAction)uploadImagesAction:(id)sender {
-    [self displayUploadingInProgressMessage];
-    [self startImageUploadRequests];
+    //For testing only
+    [self performSegueWithIdentifier:@"imagesUploadedSegue" sender:self];
+    //[self displayUploadingInProgressMessage];
+    //[self startImageUploadRequests];
 }
 
 #pragma mark Netowrking for Upload of Images
