@@ -13,5 +13,12 @@
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, strong) NSString *publishedBy;
 @property (nonatomic, strong) NSURL *imageURL;
+@property (nonatomic, strong) NSString *transcript;
+@property (nonatomic, strong) NSString *postcode;
+@property (nonatomic, strong) NSString *electorate;
+@property (nonatomic, strong) NSString *deliveryTime;
+@property (nonatomic, strong) NSArray *partiesAttacked;
+@property (nonatomic, strong) NSArray *categories;
+@property (nonatomic, strong) NSString *tags;
 
 @end

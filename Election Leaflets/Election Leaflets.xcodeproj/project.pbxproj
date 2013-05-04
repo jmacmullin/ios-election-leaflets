@@ -45,6 +45,8 @@
 		2312AFA81728A14B00781129 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2312AFA61728A13D00781129 /* MobileCoreServices.framework */; };
 		2312AFA91728A14B00781129 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2312AFA41728A13700781129 /* SystemConfiguration.framework */; };
 		7980E4C81734A4F100232951 /* DetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7980E4C71734A4F000232951 /* DetailsViewController.m */; };
+		7980E4CB1734ED9900232951 /* LeafletDetailsCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7980E4CA1734ED9900232951 /* LeafletDetailsCell.m */; };
+		7980E4CE17351CCF00232951 /* LeafletTagAndSubmitCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7980E4CD17351CCF00232951 /* LeafletTagAndSubmitCell.m */; };
 		7995B320172B97A50006C534 /* UploadPictureCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7995B31F172B97A50006C534 /* UploadPictureCell.m */; };
 		79BB1075172C125B00BAE5FB /* instructions_nocamera.png in Resources */ = {isa = PBXBuildFile; fileRef = 79BB1073172C125B00BAE5FB /* instructions_nocamera.png */; };
 		79BB1076172C125B00BAE5FB /* instructions.png in Resources */ = {isa = PBXBuildFile; fileRef = 79BB1074172C125B00BAE5FB /* instructions.png */; };
@@ -103,6 +105,10 @@
 		6CBA53AFE38B43F3804010E0 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		7980E4C61734A4F000232951 /* DetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DetailsViewController.h; path = "View Controllers/DetailsViewController.h"; sourceTree = "<group>"; };
 		7980E4C71734A4F000232951 /* DetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DetailsViewController.m; path = "View Controllers/DetailsViewController.m"; sourceTree = "<group>"; };
+		7980E4C91734ED9900232951 /* LeafletDetailsCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LeafletDetailsCell.h; path = Views/LeafletDetailsCell.h; sourceTree = "<group>"; };
+		7980E4CA1734ED9900232951 /* LeafletDetailsCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LeafletDetailsCell.m; path = Views/LeafletDetailsCell.m; sourceTree = "<group>"; };
+		7980E4CC17351CCF00232951 /* LeafletTagAndSubmitCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LeafletTagAndSubmitCell.h; path = Views/LeafletTagAndSubmitCell.h; sourceTree = "<group>"; };
+		7980E4CD17351CCF00232951 /* LeafletTagAndSubmitCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LeafletTagAndSubmitCell.m; path = Views/LeafletTagAndSubmitCell.m; sourceTree = "<group>"; };
 		7995B31E172B97A50006C534 /* UploadPictureCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UploadPictureCell.h; path = Views/UploadPictureCell.h; sourceTree = "<group>"; };
 		7995B31F172B97A50006C534 /* UploadPictureCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UploadPictureCell.m; path = Views/UploadPictureCell.m; sourceTree = "<group>"; };
 		79BB1073172C125B00BAE5FB /* instructions_nocamera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = instructions_nocamera.png; path = Images/instructions_nocamera.png; sourceTree = "<group>"; };
@@ -232,6 +238,10 @@
 				2312AF6C1725514800781129 /* JMMLeafletCell.m */,
 				7995B31E172B97A50006C534 /* UploadPictureCell.h */,
 				7995B31F172B97A50006C534 /* UploadPictureCell.m */,
+				7980E4C91734ED9900232951 /* LeafletDetailsCell.h */,
+				7980E4CA1734ED9900232951 /* LeafletDetailsCell.m */,
+				7980E4CC17351CCF00232951 /* LeafletTagAndSubmitCell.h */,
+				7980E4CD17351CCF00232951 /* LeafletTagAndSubmitCell.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -392,6 +402,8 @@
 				2312AF9B172790E100781129 /* JMMAboutViewController.m in Sources */,
 				7995B320172B97A50006C534 /* UploadPictureCell.m in Sources */,
 				7980E4C81734A4F100232951 /* DetailsViewController.m in Sources */,
+				7980E4CB1734ED9900232951 /* LeafletDetailsCell.m in Sources */,
+				7980E4CE17351CCF00232951 /* LeafletTagAndSubmitCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DetailsViewController : UITableViewController
+@interface DetailsViewController : UITableViewController <UITextViewDelegate>
 
 @end
