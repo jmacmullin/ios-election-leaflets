@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Jake MacMullin. All rights reserved.
 //
 
+#import <QuartzCore/CAScrollLayer.h>
 #import "DetailsViewController.h"
 #import "JMMLeaflet.h"
 
@@ -20,6 +21,7 @@
 
 //Keyboard state
 @property (nonatomic) BOOL keyboardVisible;
+@property (nonatomic, strong) UIView *scrollToView;
 
 @end
 
@@ -28,6 +30,7 @@
 @synthesize defaultTranscriptTextViewText;
 @synthesize defaultTagsTextViewText;
 @synthesize keyboardVisible;
+@synthesize scrollToView;
 
 - (NSArray *) pickListCategories
 {
@@ -72,12 +75,25 @@
                                              selector:@selector(keyboardWillHide:)
                                                  name:UIKeyboardWillHideNotification
                                                object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardDidShow:)
+                                                 name:UIKeyboardDidShowNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardDidHide:)
+                                                 name:UIKeyboardDidHideNotification
+                                               object:nil];
     
     self.defaultTranscriptTextViewText = @"Enter a transcript of the main points/ first paragraph, note that this should be only what is actually on the leaflet, not your opinion of it...";
     self.defaultTagsTextViewText = @"Tags this leaflet (candidate name, town, policy name, etc)...";
     
+    [self.leafletTitle setDelegate:self];
     [self.leafletTranscript setDelegate:self];
+    [self.leafletPostcode setDelegate:self];
     [self.leafletTags setDelegate:self];
+    [self.submitterName setDelegate:self];
+    //[self.submitterEmail setDelegate:self];
     
     [self addLeftPaddingTo:self.leafletTitle];
     [self addLeftPaddingTo:self.leafletPostcode];
@@ -129,8 +145,6 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [self.view endEditing:YES];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Test" message:self.leafletTranscript.text delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
-    [alert show];
     // Navigation logic may go here. Create and push another view controller.
     /*
      <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
@@ -149,10 +163,11 @@
         [textView setText:@""];
     }
     textView.textColor = [UIColor blackColor];
-    CGRect scrollToFrame = textView.frame; //start with the text view frame
-    scrollToFrame.origin.y += [textView superview].frame.origin.y - 30; //move up to include label
-    scrollToFrame.size.height += 30; //move size up by the same amount
-    [self.tableView scrollRectToVisible:scrollToFrame animated:YES]; //scroll to the new rect
+    if (keyboardVisible) {
+        [self scrollToTextInput:textView];
+    } else {
+        self.scrollToView = textView;
+    }
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView
@@ -164,6 +179,17 @@
             textView.text = self.defaultTagsTextViewText;
         }
         [textView setTextColor:[UIColor colorWithRed:170.0/255.0 green:170.0/255.0 blue:170.0/255.0 alpha:1.0f]];
+    }
+}
+
+#pragma mark - Text field delegate
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField
+{
+    if (keyboardVisible) {
+        [self scrollToTextInput:textField];
+    } else {
+        self.scrollToView = textField;
     }
 }
 
@@ -232,6 +258,53 @@
                         options:(curve)
                      animations:action
                      completion:nil];
+
+    
+    
+}
+
+- (void)keyboardDidShow:(NSNotification *)notification
+{
+    [self scrollToViewFollowingKeyboardChnage];
+}
+
+- (void)keyboardDidHide:(NSNotification *)notification
+{
+    [self scrollToViewFollowingKeyboardChnage];
+}
+
+- (void)scrollToViewFollowingKeyboardChnage
+{
+    if (self.scrollToView) {
+        [self scrollToTextInput:self.scrollToView];
+        self.scrollToView = nil;
+    }
+}
+
+#pragma mark - Scroll to text field/view
+
+- (void)scrollToTextInput:(UIView *)view
+{
+    
+    //CGRect scrollToFrame = CGRectZero; //start with the bonds of the table view
+    //scrollToFrame.size = [self.tableView contentSize];
+    //scrollToFrame.origin = view.frame.origin; //set the origin to that of the first responder
+    //scrollToFrame.origin.y -=30; //move up slightly to view the label associated with the field
+    //[self.tableView scrollRectToVisible:scrollToFrame animated:YES]; //scroll to the new rect
+    void (^action)(void) = ^{
+        CGPoint newPoint = view.frame.origin;
+        newPoint = [[view superview] convertPoint:newPoint toView:self.tableView];
+        newPoint.x = 0;
+        newPoint.y -= 30;
+        self.tableView.contentOffset = newPoint;
+    };
+    
+    [UIView animateWithDuration:0.5
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:action
+                     completion:nil];
+    
 }
 
 

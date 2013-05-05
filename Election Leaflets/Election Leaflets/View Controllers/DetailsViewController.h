@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DetailsViewController : UITableViewController <UITextViewDelegate>
+@interface DetailsViewController : UITableViewController <UITextViewDelegate, UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UITextField *leafletTitle;
 @property (weak, nonatomic) IBOutlet UITextView *leafletTranscript;
 @property (weak, nonatomic) IBOutlet UITextField *leafletPostcode;
