@@ -6,7 +6,8 @@
 //  Copyright (c) 2013 Jake MacMullin. All rights reserved.
 //
 
-#import <QuartzCore/CAScrollLayer.h>
+#import <hpple/TFHpple.h>
+#import <hpple/XPathQuery.h>
 #import "DetailsViewController.h"
 #import "JMMLeaflet.h"
 
@@ -23,6 +24,18 @@
 @property (nonatomic) BOOL keyboardVisible;
 @property (nonatomic, strong) UIView *scrollToView;
 
+//Electorates
+@property (nonatomic, strong) NSDictionary *electorates;
+
+//Delivery times
+@property (nonatomic, strong) NSDictionary *deliveryTimes;
+
+//Political parties
+@property (nonatomic, strong) NSDictionary *parties;
+
+//Categores
+@property (nonatomic, strong) NSDictionary *categories;
+
 @end
 
 @implementation DetailsViewController
@@ -31,6 +44,12 @@
 @synthesize defaultTagsTextViewText;
 @synthesize keyboardVisible;
 @synthesize scrollToView;
+@synthesize uploadKey;
+@synthesize htmlData;
+@synthesize electorates;
+@synthesize deliveryTimes;
+@synthesize parties;
+@synthesize categories;
 
 - (NSArray *) pickListCategories
 {
@@ -61,6 +80,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
     
     UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideKeyboard)];
     gestureRecognizer.cancelsTouchesInView = NO;
@@ -99,6 +119,11 @@
     [self addLeftPaddingTo:self.leafletPostcode];
     [self addLeftPaddingTo:self.submitterName];
     [self addLeftPaddingTo:self.submitterEmail];
+    
+    [self setupElectorates];
+    [self setupDeliveryTimes];
+    [self setupParties];
+    [self setupCategories];
 
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
@@ -111,6 +136,61 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)setupElectorates
+{
+    NSMutableDictionary *mutableElectorates = [[NSMutableDictionary alloc] init];
+    TFHpple *htmlDoc = [[TFHpple alloc] initWithHTMLData:self.htmlData];
+    TFHppleElement *listOfElectorates = [htmlDoc searchWithXPathQuery:@"//select[@id='ddlConstituency']"][0];
+    NSArray *elements = listOfElectorates.children;
+    for (TFHppleElement *element in elements) {
+        if (element.firstChild.content) {
+            [mutableElectorates setObject:element.firstChild.content forKey:element.firstChild.content];
+        }
+    }
+    self.electorates = [[NSDictionary alloc] initWithDictionary:mutableElectorates];
+}
+
+- (void)setupDeliveryTimes
+{
+    NSMutableDictionary *mutableDeliveryTimes = [[NSMutableDictionary alloc] init];
+    TFHpple *htmlDoc = [[TFHpple alloc] initWithHTMLData:self.htmlData];
+    TFHppleElement *listOfDeliveryTimes = [htmlDoc searchWithXPathQuery:@"//select[@id='ddlDelivered']"][0];
+    NSArray *elements = listOfDeliveryTimes.children;
+    for (TFHppleElement *element in elements) {
+        if (element.firstChild.content) {
+            [mutableDeliveryTimes setObject:element.firstChild.content forKey:[element.attributes objectForKey:@"value"]];
+        }
+    }
+    self.deliveryTimes = [[NSDictionary alloc] initWithDictionary:mutableDeliveryTimes];
+}
+
+- (void)setupParties
+{
+    NSMutableDictionary *mutableParties = [[NSMutableDictionary alloc] init];
+    TFHpple *htmlDoc = [[TFHpple alloc] initWithHTMLData:self.htmlData];
+    TFHppleElement *listOfParties = [htmlDoc searchWithXPathQuery:@"//select[@id='ddlPartyBy']"][0];
+    NSArray *elements = listOfParties.children;
+    for (TFHppleElement *element in elements){
+        if (element.firstChild.content) {
+            [mutableParties setObject:element.firstChild.content forKey:[element.attributes objectForKey:@"value"]];
+        }
+    }
+    self.parties = [[NSDictionary alloc] initWithDictionary:mutableParties];
+}
+
+- (void)setupCategories
+{
+    NSMutableDictionary *mutableCategories = [[NSMutableDictionary alloc] init];
+    TFHpple *htmlDoc = [[TFHpple alloc] initWithHTMLData:self.htmlData];
+    NSArray *listOfInputElements = [htmlDoc searchWithXPathQuery:@"//input[contains(@name,'chkCategory')]"];
+    for (TFHppleElement *inputElement in listOfInputElements) {
+        NSLog(@"%@",[inputElement.attributes objectForKey:@"value"]);
+        NSString *queryString = [NSString stringWithFormat:@"//label[@for='chkCategory_%@']",[inputElement.attributes objectForKey:@"value"]];
+        TFHppleElement *labelElement = [htmlDoc searchWithXPathQuery:queryString][0];
+        NSLog(@"%@", labelElement.firstChild.content);
+    }
 }
 
 #pragma mark - Table view data source

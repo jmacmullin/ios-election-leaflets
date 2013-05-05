@@ -10,6 +10,7 @@
 #import <AFNetworking/AFHTTPRequestOperation.h>
 #import "JMMUploadViewController.h"
 #import "UploadPictureCell.h"
+#import "DetailsViewController.h"
 
 @interface JMMUploadViewController ()
 //Images
@@ -137,9 +138,9 @@
 
 - (IBAction)uploadImagesAction:(id)sender {
     //For testing only
-    [self performSegueWithIdentifier:@"imagesUploadedSegue" sender:self];
-    //[self displayUploadingInProgressMessage];
-    //[self startImageUploadRequests];
+    //[self performSegueWithIdentifier:@"imagesUploadedSegue" sender:self];
+    [self displayUploadingInProgressMessage];
+    [self startImageUploadRequests];
 }
 
 #pragma mark Netowrking for Upload of Images
@@ -189,6 +190,7 @@
         NSLog(@"Sent %lld of %lld bytes", totalBytesWritten, totalBytesExpectedToWrite);
     }];
     [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+        self.uploadedImagesResponse = responseObject;
         NSString *locationString = [[operation.response allHeaderFields] objectForKey:@"x-url"];
         NSRange keyRange = [locationString rangeOfString:@"key="];
         keyRange.location = keyRange.location + keyRange.length;
@@ -327,6 +329,17 @@
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         [self.capturedImages removeObjectAtIndex:indexPath.row];
         [tableView reloadData];
+    }
+}
+
+#pragma mark - Prepare for Segue
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([segue.identifier isEqualToString:@"imagesUploadedSegue"]) {
+        DetailsViewController *destinationVC = (DetailsViewController *)[segue destinationViewController];
+        destinationVC.uploadKey = self.uploadedImagesKey;
+        destinationVC.htmlData = self.uploadedImagesResponse;
     }
 }
 

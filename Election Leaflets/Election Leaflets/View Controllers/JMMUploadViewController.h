@@ -13,5 +13,6 @@
 @property (nonatomic, strong) UIImagePickerController * imagePickerController;
 @property (nonatomic, strong) id <UIImagePickerControllerDelegate> delegate;
 @property (nonatomic, strong) NSString *uploadedImagesKey;
+@property (nonatomic, strong) NSData *uploadedImagesResponse;
 
 @end
