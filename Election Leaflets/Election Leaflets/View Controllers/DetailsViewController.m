@@ -18,12 +18,16 @@
 @property (nonatomic, strong) NSString *defaultTranscriptTextViewText;
 @property (nonatomic, strong) NSString *defaultTagsTextViewText;
 
+//Keyboard state
+@property (nonatomic) BOOL keyboardVisible;
+
 @end
 
 @implementation DetailsViewController
 
 @synthesize defaultTranscriptTextViewText;
 @synthesize defaultTagsTextViewText;
+@synthesize keyboardVisible;
 
 - (NSArray *) pickListCategories
 {
@@ -54,6 +58,20 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideKeyboard)];
+    gestureRecognizer.cancelsTouchesInView = NO;
+    [self.tableView addGestureRecognizer:gestureRecognizer];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillShow:)
+                                                 name:UIKeyboardWillShowNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillHide:)
+                                                 name:UIKeyboardWillHideNotification
+                                               object:nil];
     
     self.defaultTranscriptTextViewText = @"Enter a transcript of the main points/ first paragraph, note that this should be only what is actually on the leaflet, not your opinion of it...";
     self.defaultTagsTextViewText = @"Tags this leaflet (candidate name, town, policy name, etc)...";
@@ -132,8 +150,8 @@
     }
     textView.textColor = [UIColor blackColor];
     CGRect scrollToFrame = textView.frame; //start with the text view frame
-    scrollToFrame.origin.y = scrollToFrame.origin.y - 30; //move up to include label
-    scrollToFrame.size.height = scrollToFrame.size.height - 30; //move size up by the same amount
+    scrollToFrame.origin.y += [textView superview].frame.origin.y - 30; //move up to include label
+    scrollToFrame.size.height += 30; //move size up by the same amount
     [self.tableView scrollRectToVisible:scrollToFrame animated:YES]; //scroll to the new rect
 }
 
@@ -156,5 +174,66 @@
     textField.leftView = paddingView;
     textField.leftViewMode = UITextFieldViewModeAlways;
 }
+
+#pragma mark - Keyboard handling
+- (void)hideKeyboard
+{
+    [self.view endEditing:YES];
+}
+
+- (void)keyboardWillShow:(NSNotification *)notification
+{
+    if (!self.keyboardVisible)
+    {
+        CGRect keyboardFrame = [self retrieveFrameFromNotification:notification];
+        CGSize delta = CGSizeMake(0, keyboardFrame.size.height);
+        [self notifySizeChanged:delta notification:notification];
+        self.keyboardVisible = YES;
+    }
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification
+{
+    if (self.keyboardVisible)
+    {
+        CGRect keyboardFrame = [self retrieveFrameFromNotification:notification];
+        CGSize delta = CGSizeMake(0, -keyboardFrame.size.height);
+        [self notifySizeChanged:delta notification:notification];
+        self.keyboardVisible = NO;
+    }
+}
+
+- (CGRect)retrieveFrameFromNotification:(NSNotification *)notification
+{
+    CGRect keyboardRect;
+    [[[notification userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey] getValue:&keyboardRect];
+    return keyboardRect;
+}
+
+- (void)notifySizeChanged:(CGSize)delta notification:(NSNotification *)notification
+{
+    NSDictionary *info = [notification userInfo];
+    
+    UIViewAnimationOptions curve;
+    [[info objectForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&curve];
+    
+    NSTimeInterval duration;
+    [[info objectForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&duration];
+    //duration not used, due to black box appearing at top of screen during keyboard hiding...
+    
+    void (^action)(void) = ^{
+        CGRect updatedFrame = self.tableView.frame; //retrieve existing
+        updatedFrame.size.height += delta.height; //change the height
+        self.tableView.frame = updatedFrame; //change the frame size
+    };
+    
+    [UIView animateWithDuration:0.0
+                          delay:0.0
+                        options:(curve)
+                     animations:action
+                     completion:nil];
+}
+
+
 
 @end
