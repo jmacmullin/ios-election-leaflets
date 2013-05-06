@@ -10,6 +10,7 @@
 #import <hpple/XPathQuery.h>
 #import "DetailsViewController.h"
 #import "JMMLeaflet.h"
+#import "PickListViewController.h"
 
 @interface DetailsViewController ()
 
@@ -26,15 +27,19 @@
 
 //Electorates
 @property (nonatomic, strong) NSDictionary *electorates;
+@property (nonatomic, strong) NSArray *electoratesOrderedKeys;
 
 //Delivery times
 @property (nonatomic, strong) NSDictionary *deliveryTimes;
+@property (nonatomic, strong) NSArray *deliveryTimesOrderedKeys;
 
 //Political parties
 @property (nonatomic, strong) NSDictionary *parties;
+@property (nonatomic, strong) NSArray *partiesOrderedKeys;
 
 //Categores
 @property (nonatomic, strong) NSDictionary *categories;
+@property (nonatomic, strong) NSArray *categoriesOrderedKeys;
 
 @end
 
@@ -47,9 +52,13 @@
 @synthesize uploadKey;
 @synthesize htmlData;
 @synthesize electorates;
+@synthesize electoratesOrderedKeys;
 @synthesize deliveryTimes;
+@synthesize deliveryTimesOrderedKeys;
 @synthesize parties;
+@synthesize partiesOrderedKeys;
 @synthesize categories;
+@synthesize categoriesOrderedKeys;
 
 - (NSArray *) pickListCategories
 {
@@ -125,11 +134,6 @@
     [self setupParties];
     [self setupCategories];
 
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
- 
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
 
 - (void)didReceiveMemoryWarning
@@ -150,6 +154,7 @@
         }
     }
     self.electorates = [[NSDictionary alloc] initWithDictionary:mutableElectorates];
+    self.electoratesOrderedKeys = [[NSArray alloc] initWithArray:[self.electorates.allKeys sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)]];
 }
 
 - (void)setupDeliveryTimes
@@ -164,6 +169,10 @@
         }
     }
     self.deliveryTimes = [[NSDictionary alloc] initWithDictionary:mutableDeliveryTimes];
+    self.deliveryTimesOrderedKeys = [[NSArray alloc] init];
+    self.deliveryTimesOrderedKeys = [self.deliveryTimes.allKeys sortedArrayUsingComparator:^NSComparisonResult(NSString* str1, NSString* str2) {
+        return [str1 compare:str2 options:(NSNumericSearch)];
+    }];
 }
 
 - (void)setupParties
@@ -174,10 +183,18 @@
     NSArray *elements = listOfParties.children;
     for (TFHppleElement *element in elements){
         if (element.firstChild.content) {
-            [mutableParties setObject:element.firstChild.content forKey:[element.attributes objectForKey:@"value"]];
+            NSString *partyName = [element.firstChild.content stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+            partyName = [partyName stringByReplacingOccurrencesOfString:@"\t" withString:@""];
+            [mutableParties setObject:partyName forKey:[element.attributes objectForKey:@"value"]];
         }
     }
     self.parties = [[NSDictionary alloc] initWithDictionary:mutableParties];
+    NSArray *orderValues = [[NSArray alloc] initWithArray:[self.parties.allValues sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)]];
+    NSMutableArray *orderKeys = [[NSMutableArray alloc] init];
+    for (NSString *value in orderValues) {
+        [orderKeys addObject:[[self.parties allKeysForObject:value] objectAtIndex:0]];
+    }
+    self.partiesOrderedKeys = [[NSArray alloc] initWithArray:orderKeys];
 }
 
 - (void)setupCategories
@@ -186,11 +203,19 @@
     TFHpple *htmlDoc = [[TFHpple alloc] initWithHTMLData:self.htmlData];
     NSArray *listOfInputElements = [htmlDoc searchWithXPathQuery:@"//input[contains(@name,'chkCategory')]"];
     for (TFHppleElement *inputElement in listOfInputElements) {
-        NSLog(@"%@",[inputElement.attributes objectForKey:@"value"]);
+        //NSLog(@"%@",[inputElement.attributes objectForKey:@"value"]);
         NSString *queryString = [NSString stringWithFormat:@"//label[@for='chkCategory_%@']",[inputElement.attributes objectForKey:@"value"]];
         TFHppleElement *labelElement = [htmlDoc searchWithXPathQuery:queryString][0];
-        NSLog(@"%@", labelElement.firstChild.content);
+        //NSLog(@"%@", labelElement.firstChild.content);
+        [mutableCategories setObject:labelElement.firstChild.content forKey:[inputElement.attributes objectForKey:@"value"]];
     }
+    self.categories = [[NSDictionary alloc] initWithDictionary:mutableCategories];
+    NSArray *orderValues = [[NSArray alloc] initWithArray:[self.categories.allValues sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)]];
+    NSMutableArray *orderKeys = [[NSMutableArray alloc] init];
+    for (NSString *value in orderValues) {
+        [orderKeys addObject:[[self.categories allKeysForObject:value] objectAtIndex:0]];
+    }
+    self.categoriesOrderedKeys = [[NSArray alloc] initWithArray:orderKeys];
 }
 
 #pragma mark - Table view data source
@@ -225,13 +250,6 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [self.view endEditing:YES];
-    // Navigation logic may go here. Create and push another view controller.
-    /*
-     <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
-     // ...
-     // Pass the selected object to the new view controller.
-     [self.navigationController pushViewController:detailViewController animated:YES];
-     */
 }
 
 #pragma mark - Text view delegate
@@ -365,12 +383,6 @@
 
 - (void)scrollToTextInput:(UIView *)view
 {
-    
-    //CGRect scrollToFrame = CGRectZero; //start with the bonds of the table view
-    //scrollToFrame.size = [self.tableView contentSize];
-    //scrollToFrame.origin = view.frame.origin; //set the origin to that of the first responder
-    //scrollToFrame.origin.y -=30; //move up slightly to view the label associated with the field
-    //[self.tableView scrollRectToVisible:scrollToFrame animated:YES]; //scroll to the new rect
     void (^action)(void) = ^{
         CGPoint newPoint = view.frame.origin;
         newPoint = [[view superview] convertPoint:newPoint toView:self.tableView];
@@ -385,6 +397,43 @@
                      animations:action
                      completion:nil];
     
+}
+
+#pragma mark - Prepare for segue
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([segue.identifier isEqualToString:@"pickListSegue"] ) {
+        PickListViewController *destinationVC = (PickListViewController *)[segue destinationViewController];
+        UITableViewCell *senderCell = (UITableViewCell *)sender;
+        NSString *senderText = senderCell.textLabel.text;
+        if ([senderText isEqualToString:self.pickListCategories[0]]) {
+            destinationVC.title = @"Electorates";
+            destinationVC.pickList = self.electorates;
+            destinationVC.orderedKeys = self.electoratesOrderedKeys;
+            destinationVC.multipleSelectionMode = NO;
+        } else if ([senderText isEqualToString:self.pickListCategories[1]]) {
+            destinationVC.title = @"Delivery Time";
+            destinationVC.pickList = self.deliveryTimes;
+            destinationVC.orderedKeys = self.deliveryTimesOrderedKeys;
+            destinationVC.multipleSelectionMode = NO;
+        } else if ([senderText isEqualToString:self.pickListCategories[2]]) {
+            destinationVC.title = @"Responsible Party";
+            destinationVC.pickList = self.parties;
+            destinationVC.orderedKeys = self.partiesOrderedKeys;
+            destinationVC.multipleSelectionMode = NO;
+        } else if ([senderText isEqualToString:self.pickListCategories[3]]){
+            destinationVC.title = @"Attacked Parties";
+            destinationVC.pickList = self.parties;
+            destinationVC.orderedKeys = self.partiesOrderedKeys;
+            destinationVC.multipleSelectionMode = YES;
+        } else if ([senderText isEqualToString:self.pickListCategories[4]]){
+            destinationVC.title = @"Categories";
+            destinationVC.pickList = self.categories;
+            destinationVC.orderedKeys = self.categoriesOrderedKeys;
+            destinationVC.multipleSelectionMode = YES;
+        }
+    }
 }
 
 
