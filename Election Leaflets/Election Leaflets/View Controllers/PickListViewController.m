@@ -7,8 +7,11 @@
 //
 
 #import "PickListViewController.h"
+#import "DetailsViewController.h"
 
 @interface PickListViewController ()
+
+@property (nonatomic, strong) NSMutableIndexSet *selectedIndexes;
 
 @end
 
@@ -17,6 +20,8 @@
 @synthesize pickList;
 @synthesize multipleSelectionMode;
 @synthesize orderedKeys;
+@synthesize resultKey;
+@synthesize selectedIndexes;
 
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -31,21 +36,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    self.selectedIndexes = [[NSMutableIndexSet alloc] init];
 
     self.clearsSelectionOnViewWillAppear = NO;
-    
-//    NSMutableArray *mutableOrderKeys = [[NSMutableArray alloc] init];
-//    [self.pickList enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-//        [mutableOrderKeys addObject:key];
-//    }];
-//    if ([mutableOrderKeys[0] intValue]) {
-//        [mutableOrderKeys sortUsingComparator:^NSComparisonResult(NSString *str1, NSString *str2) {
-//            return [str1 compare:str2 options:(NSNumericSearch)];
-//        }];
-//    } else {
-//        [mutableOrderKeys sortUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-//    }
-//    self.orderedKeys = [[NSArray alloc] initWithArray:mutableOrderKeys];
 }
 
 - (void)didReceiveMemoryWarning
@@ -54,7 +48,7 @@
     // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - Table view data source
+#pragma mark - Table View Data Source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -77,59 +71,47 @@
     NSString *key = self.orderedKeys[indexPath.row];
     cell.textLabel.text = [self.pickList objectForKey:key];
     
+    cell.accessoryType = UITableViewCellAccessoryNone;
+    [self.selectedIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+        if (indexPath.row == idx){
+            cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            *stop = YES;
+        }
+    }];
     return cell;
 }
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-#pragma mark - Table view delegate
+#pragma mark - Table View Delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // Navigation logic may go here. Create and push another view controller.
-    /*
-     <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
-     // ...
-     // Pass the selected object to the new view controller.
-     [self.navigationController pushViewController:detailViewController animated:YES];
-     */
+    if (!self.multipleSelectionMode){
+        [self.selectedIndexes removeAllIndexes];
+    }
+    [self.selectedIndexes addIndex:indexPath.row];
+    [self.tableView reloadData];
+    if (!self.multipleSelectionMode){
+        //If only one key is required, we can select it and then transition back the details table view controller
+        NSString *selectedKey = [self.orderedKeys objectAtIndex:indexPath.row];
+        DetailsViewController *detailsVC = [self.navigationController.viewControllers objectAtIndex:[self.navigationController.viewControllers count] - 2];
+        [detailsVC selectedPickListKeys:[NSArray arrayWithObject:selectedKey] forPickListType:self.title];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_current_queue(), ^{
+            [self.navigationController popViewControllerAnimated:YES];
+        });
+    }
+}
+
+#pragma mark - View Will Disappear
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    if (self.isMovingFromParentViewController && [self.selectedIndexes count] > 1){
+        //Assuming the only way available is back to the details view controller
+        DetailsViewController *detailsVC = [self.navigationController.viewControllers objectAtIndex:[self.navigationController.viewControllers count] - 1];
+        NSArray *selectedKeys = [self.orderedKeys objectsAtIndexes:self.selectedIndexes];
+        [detailsVC selectedPickListKeys:selectedKeys forPickListType:self.title];
+    }
+    [super viewWillDisappear:animated];
 }
 
 @end

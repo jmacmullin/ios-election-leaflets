@@ -24,4 +24,7 @@
 //Uploaded Images HTML response
 @property (nonatomic, strong) NSData *htmlData;
 
+//Pick List Selections
+- (void) selectedPickListKeys:(NSArray *)selectedKeys forPickListType:(NSString *)pickListType;
+
 @end

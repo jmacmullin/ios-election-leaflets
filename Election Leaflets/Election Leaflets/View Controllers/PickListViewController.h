@@ -13,5 +13,6 @@
 @property (nonatomic, strong) NSDictionary *pickList;
 @property (nonatomic, strong) NSArray *orderedKeys;
 @property (nonatomic) BOOL multipleSelectionMode;
+@property (nonatomic, strong) NSString *resultKey;
 
 @end

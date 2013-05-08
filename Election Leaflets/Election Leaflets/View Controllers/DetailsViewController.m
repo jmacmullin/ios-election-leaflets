@@ -15,7 +15,8 @@
 @interface DetailsViewController ()
 
 //List of categories which require the user to select one or more options from a list
-@property (nonatomic, strong) NSArray *pickListCategories;
+@property (nonatomic, strong) NSArray *pickListKeys;
+@property (nonatomic, strong) NSMutableDictionary *pickListValues;
 
 //Default text for the text view items
 @property (nonatomic, strong) NSString *defaultTranscriptTextViewText;
@@ -37,9 +38,11 @@
 @property (nonatomic, strong) NSDictionary *parties;
 @property (nonatomic, strong) NSArray *partiesOrderedKeys;
 
-//Categores
+//Categories
 @property (nonatomic, strong) NSDictionary *categories;
 @property (nonatomic, strong) NSArray *categoriesOrderedKeys;
+
+
 
 @end
 
@@ -60,19 +63,36 @@
 @synthesize categories;
 @synthesize categoriesOrderedKeys;
 
-- (NSArray *) pickListCategories
+- (NSArray *) pickListKeys
 {
     //The pick list categories and the choices associated with them will need to be extracted from the HTML
     //returned to the upload view controller after uploading the images, temp hard-coded below
-    if (!_pickListCategories){
-        _pickListCategories = @[@"Which electorate was the leaflet delivered to?",
-                                @"When was the leaflet delivered?",
-                                @"Which party is responsible for the leaflet?",
-                                @"Which parties (if any) does the leaflet criticise?",
-                                @"Which categories (if any) best describe this leaflet?"
-                                ];
+    if (!_pickListKeys){
+        _pickListKeys = @[@"Electorates",
+                          @"Delivery",
+                          @"Responible Party",
+                          @"Attacked Parties",
+                          @"Categories"
+                          ];
     }
-    return _pickListCategories;
+    return _pickListKeys;
+}
+
+- (NSMutableDictionary *)pickListValues
+{
+    if (!_pickListValues) {
+        _pickListValues = [[NSMutableDictionary alloc] init];
+        NSArray *initialValues = @[@"Which electorate was the leaflet delivered to?",
+                                   @"When was the leaflet delivered?",
+                                   @"Which party is responsible for the leaflet?",
+                                   @"Which parties (if any) does the leaflet criticise?",
+                                   @"Which categories (if any) best describe this leaflet?"
+                                   ];
+        for (NSString *value in initialValues) {
+            [_pickListValues setObject:[NSArray arrayWithObject:value] forKey:[self.pickListKeys objectAtIndex:[initialValues indexOfObjectIdenticalTo:value]]];
+        }
+    }
+    return _pickListValues;
 }
 
 #pragma mark - Initialisation
@@ -229,7 +249,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    return [self.pickListCategories count];
+    return [self.pickListKeys count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -239,9 +259,19 @@
     [cell prepareForReuse];
     
     // Configure the cell...
-    cell.textLabel.text = [self.pickListCategories objectAtIndex:indexPath.row];
+    cell.textLabel.text = [self stringFromPickListValuesAtIndex:indexPath.row];
     
     return cell;
+}
+
+- (NSString *)stringFromPickListValuesAtIndex:(NSInteger)index
+{
+    NSArray *selectedValueStrings = [self.pickListValues objectForKey:[self.pickListKeys objectAtIndex:index]];
+    NSString *selectedValueString = [selectedValueStrings objectAtIndex:0];
+    for (int i = 1; i < [selectedValueStrings count]; i++) {
+        selectedValueString = [selectedValueString stringByAppendingFormat:@", %@", [selectedValueStrings objectAtIndex:i]];
+    }
+    return selectedValueString;
 }
 
 
@@ -363,15 +393,15 @@
 
 - (void)keyboardDidShow:(NSNotification *)notification
 {
-    [self scrollToViewFollowingKeyboardChnage];
+    [self scrollToViewFollowingKeyboardChange];
 }
 
 - (void)keyboardDidHide:(NSNotification *)notification
 {
-    [self scrollToViewFollowingKeyboardChnage];
+    [self scrollToViewFollowingKeyboardChange];
 }
 
-- (void)scrollToViewFollowingKeyboardChnage
+- (void)scrollToViewFollowingKeyboardChange
 {
     if (self.scrollToView) {
         [self scrollToTextInput:self.scrollToView];
@@ -407,33 +437,53 @@
         PickListViewController *destinationVC = (PickListViewController *)[segue destinationViewController];
         UITableViewCell *senderCell = (UITableViewCell *)sender;
         NSString *senderText = senderCell.textLabel.text;
-        if ([senderText isEqualToString:self.pickListCategories[0]]) {
-            destinationVC.title = @"Electorates";
+        if ([senderText isEqualToString:[self stringFromPickListValuesAtIndex:0]]) {
+            destinationVC.title = self.pickListKeys[0];
             destinationVC.pickList = self.electorates;
             destinationVC.orderedKeys = self.electoratesOrderedKeys;
             destinationVC.multipleSelectionMode = NO;
-        } else if ([senderText isEqualToString:self.pickListCategories[1]]) {
-            destinationVC.title = @"Delivery Time";
+        } else if ([senderText isEqualToString:[self stringFromPickListValuesAtIndex:1]]) {
+            destinationVC.title = self.pickListKeys[1];
             destinationVC.pickList = self.deliveryTimes;
             destinationVC.orderedKeys = self.deliveryTimesOrderedKeys;
             destinationVC.multipleSelectionMode = NO;
-        } else if ([senderText isEqualToString:self.pickListCategories[2]]) {
-            destinationVC.title = @"Responsible Party";
+        } else if ([senderText isEqualToString:[self stringFromPickListValuesAtIndex:2]]) {
+            destinationVC.title = self.pickListKeys[2];
             destinationVC.pickList = self.parties;
             destinationVC.orderedKeys = self.partiesOrderedKeys;
             destinationVC.multipleSelectionMode = NO;
-        } else if ([senderText isEqualToString:self.pickListCategories[3]]){
-            destinationVC.title = @"Attacked Parties";
+        } else if ([senderText isEqualToString:[self stringFromPickListValuesAtIndex:3]]){
+            destinationVC.title = self.pickListKeys[3];
             destinationVC.pickList = self.parties;
             destinationVC.orderedKeys = self.partiesOrderedKeys;
             destinationVC.multipleSelectionMode = YES;
-        } else if ([senderText isEqualToString:self.pickListCategories[4]]){
-            destinationVC.title = @"Categories";
+        } else if ([senderText isEqualToString:[self stringFromPickListValuesAtIndex:4]]){
+            destinationVC.title = self.pickListKeys[4];
             destinationVC.pickList = self.categories;
             destinationVC.orderedKeys = self.categoriesOrderedKeys;
             destinationVC.multipleSelectionMode = YES;
         }
     }
+}
+
+#pragma mark - Selected Values
+- (void) selectedPickListKeys:(NSArray *)selectedKeys forPickListType:(NSString *)pickListType;
+{
+    NSDictionary *allValues;
+    if ([pickListType isEqualToString:self.pickListKeys[0]]) {
+        allValues = self.electorates;
+    } else if ([pickListType isEqualToString:self.pickListKeys[1]]){
+        allValues = self.deliveryTimes;
+    } else if ([pickListType isEqualToString:self.pickListKeys[2]]){
+        allValues = self.parties;
+    } else if ([pickListType isEqualToString:self.pickListKeys[3]]){
+        allValues = self.parties;
+    } else if ([pickListType isEqualToString:self.pickListKeys[4]]){
+        allValues = self.categories;
+    }
+    NSArray *selectedValues = [allValues objectsForKeys:selectedKeys notFoundMarker:@"Not found"];
+    [self.pickListValues setObject:selectedValues forKey:pickListType];
+    [self.tableView reloadData];
 }
 
 

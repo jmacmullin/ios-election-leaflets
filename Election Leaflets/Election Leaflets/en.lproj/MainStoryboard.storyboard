@@ -469,6 +469,60 @@
             <point key="canvasLocation" x="644" y="812"/>
         </scene>
     </scenes>
+    <classes>
+        <class className="DetailsViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/DetailsViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="leafletPostcode" candidateClass="UITextField"/>
+                <relationship kind="outlet" name="leafletTags" candidateClass="UITextView"/>
+                <relationship kind="outlet" name="leafletTitle" candidateClass="UITextField"/>
+                <relationship kind="outlet" name="leafletTranscript" candidateClass="UITextView"/>
+                <relationship kind="outlet" name="submitterEmail" candidateClass="UITextField"/>
+                <relationship kind="outlet" name="submitterName" candidateClass="UITextField"/>
+            </relationships>
+        </class>
+        <class className="JMMAboutViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/JMMAboutViewController.h"/>
+        </class>
+        <class className="JMMBrowseViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/JMMBrowseViewController.h"/>
+        </class>
+        <class className="JMMLeafletCell" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/JMMLeafletCell.h"/>
+            <relationships>
+                <relationship kind="outlet" name="leafletContentView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="leafletImageView" candidateClass="NINetworkImageView"/>
+                <relationship kind="outlet" name="publishedByLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="titleLabel" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+        <class className="JMMUploadViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/JMMUploadViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="cameraAction:"/>
+                <relationship kind="action" name="photoLibraryAction:"/>
+                <relationship kind="action" name="uploadImagesAction:"/>
+                <relationship kind="outlet" name="uploadImagesButton" candidateClass="UIButton"/>
+            </relationships>
+        </class>
+        <class className="LeafletButton" superclassName="UIButton">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/LeafletButton.h"/>
+        </class>
+        <class className="NINetworkImageView" superclassName="UIImageView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/NINetworkImageView.h"/>
+        </class>
+        <class className="PickListViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/PickListViewController.h"/>
+        </class>
+        <class className="UploadPictureCell" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/UploadPictureCell.h"/>
+            <relationships>
+                <relationship kind="outlet" name="uploadedPictureContentView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="uploadedPictureLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="uploadedPictureView" candidateClass="UIView"/>
+            </relationships>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>
