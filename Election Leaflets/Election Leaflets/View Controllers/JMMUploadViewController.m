@@ -122,7 +122,8 @@
 
 -(void) startImageUploadRequests
 {
-    NSURL *url = [NSURL URLWithString:@"http://www.electionleaflets.org.au/"];
+    NSURL *url = [NSURL URLWithString:@"http://dev.electionleaflets.local:8080"]; //for development only
+    //NSURL *url = [NSURL URLWithString:@"http://www.electionleaflets.org.au/"];
     AFHTTPClient *httpClient = [[AFHTTPClient alloc] initWithBaseURL:url];
     NSMutableURLRequest *request = [httpClient requestWithMethod:@"GET" path:@"addupload" parameters:nil];
     AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];

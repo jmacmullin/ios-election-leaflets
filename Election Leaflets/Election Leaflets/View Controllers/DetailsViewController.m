@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 Jake MacMullin. All rights reserved.
 //
 
+#import <AFNetworking/AFHTTPClient.h>
+#import <AFNetworking/AFHTTPRequestOperation.h>
 #import <hpple/TFHpple.h>
 #import <hpple/XPathQuery.h>
 #import "DetailsViewController.h"
@@ -41,8 +43,6 @@
 //Categories
 @property (nonatomic, strong) NSDictionary *categories;
 @property (nonatomic, strong) NSArray *categoriesOrderedKeys;
-
-
 
 @end
 
@@ -486,6 +486,41 @@
     [self.tableView reloadData];
 }
 
+- (IBAction)saveLeafletButton:(id)sender {
+    //Perform some validation
+    NSString *saveLeafletPath = [@"addinfo.php?key=" stringByAppendingString:uploadKey];
+    NSURL *url = [NSURL URLWithString:@"http://dev.electionleaflets.local:8080"]; //for development only
+    //NSURL *url = [NSURL URLWithString:@"http://www.electionleaflets.org.au/"];
+    AFHTTPClient *httpClient = [[AFHTTPClient alloc] initWithBaseURL:url];
+    NSDictionary *params = @{
+                             @"_is_postback": @"1",
+                             @"_viewstate:": @"",
+                             @"_postback_command": @"",
+                             @"_postback_arguement": @"",
+                             @"txtTitle": self.leafletTitle.text,
+                             @"txtDescription": self.leafletTranscript.text,
+                             @"txtPostcode": self.leafletPostcode.text,
+                             //These are all wrong
+                             //@"ddlConstituency": [[self.electorates allKeysForObject:self.pickListKeys[0]] objectAtIndex:0],
+                             //@"ddlDelivered": [[self.deliveryTimes allKeysForObject:self.pickListKeys[1]] objectAtIndex:0],
+                             //@"ddlPartyBy": [[self.parties allKeysForObject:self.pickListKeys[2]] objectAtIndex:0],
+                             //Method for checkboxes is more difficult to implement
+                             //@"chkPartyAttack": self.pickListKeys[3],
+                             //@"chkCategory": self.pickListKeys[4],
+                             @"txtTags": self.leafletTags.text,
+                             @"txtName": self.submitterName.text,
+                             @"txtEmail": self.submitterEmail.text,
+                             };
+    NSMutableURLRequest *request = [httpClient requestWithMethod:@"POST" path:saveLeafletPath parameters:params];
+    AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSLog(@"%@", @"Success");
+        NSLog(@"%@", [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding]);
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"%@", @"Failure");
+    }];
+    [httpClient enqueueHTTPRequestOperation:operation];
+}
 
 
 @end

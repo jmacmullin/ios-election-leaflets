@@ -191,7 +191,7 @@
                             <color key="backgroundColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
                         </view>
                         <view key="tableFooterView" contentMode="scaleToFill" id="3Xc-17-IgR">
-                            <rect key="frame" x="0.0" y="394" width="320" height="326"/>
+                            <rect key="frame" x="0.0" y="394" width="320" height="370"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="Leaflet Tags" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="MXk-9M-OBy">
@@ -237,6 +237,21 @@
                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                     <textInputTraits key="textInputTraits"/>
                                 </textField>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Xb6-fz-bZ4" customClass="LeafletButton">
+                                    <rect key="frame" x="75" y="323" width="170" height="35"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                    <state key="normal" title="Save Leaflet">
+                                        <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                    </state>
+                                    <state key="highlighted">
+                                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="saveLeafletButton:" destination="2iQ-EC-ei1" eventType="touchUpInside" id="GMr-A9-fIs"/>
+                                    </connections>
+                                </button>
                             </subviews>
                             <color key="backgroundColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
                         </view>
@@ -469,60 +484,6 @@
             <point key="canvasLocation" x="644" y="812"/>
         </scene>
     </scenes>
-    <classes>
-        <class className="DetailsViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/DetailsViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="leafletPostcode" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="leafletTags" candidateClass="UITextView"/>
-                <relationship kind="outlet" name="leafletTitle" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="leafletTranscript" candidateClass="UITextView"/>
-                <relationship kind="outlet" name="submitterEmail" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="submitterName" candidateClass="UITextField"/>
-            </relationships>
-        </class>
-        <class className="JMMAboutViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/JMMAboutViewController.h"/>
-        </class>
-        <class className="JMMBrowseViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/JMMBrowseViewController.h"/>
-        </class>
-        <class className="JMMLeafletCell" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/JMMLeafletCell.h"/>
-            <relationships>
-                <relationship kind="outlet" name="leafletContentView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="leafletImageView" candidateClass="NINetworkImageView"/>
-                <relationship kind="outlet" name="publishedByLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="titleLabel" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="JMMUploadViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/JMMUploadViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="cameraAction:"/>
-                <relationship kind="action" name="photoLibraryAction:"/>
-                <relationship kind="action" name="uploadImagesAction:"/>
-                <relationship kind="outlet" name="uploadImagesButton" candidateClass="UIButton"/>
-            </relationships>
-        </class>
-        <class className="LeafletButton" superclassName="UIButton">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/LeafletButton.h"/>
-        </class>
-        <class className="NINetworkImageView" superclassName="UIImageView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/NINetworkImageView.h"/>
-        </class>
-        <class className="PickListViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/PickListViewController.h"/>
-        </class>
-        <class className="UploadPictureCell" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/UploadPictureCell.h"/>
-            <relationships>
-                <relationship kind="outlet" name="uploadedPictureContentView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="uploadedPictureLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="uploadedPictureView" candidateClass="UIView"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>
