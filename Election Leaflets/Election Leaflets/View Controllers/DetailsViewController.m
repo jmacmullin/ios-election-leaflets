@@ -18,7 +18,8 @@
 
 //List of categories which require the user to select one or more options from a list
 @property (nonatomic, strong) NSArray *pickListKeys;
-@property (nonatomic, strong) NSMutableDictionary *pickListValues;
+@property (nonatomic, strong) NSMutableDictionary *pickListSelectedValues;
+@property (nonatomic, strong) NSMutableDictionary *pickListSelectedKeys;
 
 //Default text for the text view items
 @property (nonatomic, strong) NSString *defaultTranscriptTextViewText;
@@ -61,27 +62,28 @@
 @synthesize parties;
 @synthesize partiesOrderedKeys;
 @synthesize categories;
-@synthesize categoriesOrderedKeys;
+@synthesize categoriesOrderedKeys; 
+@synthesize pickListSelectedKeys;
 
 - (NSArray *) pickListKeys
 {
     //The pick list categories and the choices associated with them will need to be extracted from the HTML
     //returned to the upload view controller after uploading the images, temp hard-coded below
     if (!_pickListKeys){
-        _pickListKeys = @[@"Electorates",
-                          @"Delivery",
-                          @"Responible Party",
-                          @"Attacked Parties",
-                          @"Categories"
+        _pickListKeys = @[PL_ELECTORATES,
+                          PL_DELIVERY,
+                          PL_PARTY,
+                          PL_ATTACKEDPARTIES,
+                          PL_CATEGORIES
                           ];
     }
     return _pickListKeys;
 }
 
-- (NSMutableDictionary *)pickListValues
+- (NSMutableDictionary *)pickListSelectedValues
 {
-    if (!_pickListValues) {
-        _pickListValues = [[NSMutableDictionary alloc] init];
+    if (!_pickListSelectedValues) {
+        _pickListSelectedValues = [[NSMutableDictionary alloc] init];
         NSArray *initialValues = @[@"Which electorate was the leaflet delivered to?",
                                    @"When was the leaflet delivered?",
                                    @"Which party is responsible for the leaflet?",
@@ -89,10 +91,18 @@
                                    @"Which categories (if any) best describe this leaflet?"
                                    ];
         for (NSString *value in initialValues) {
-            [_pickListValues setObject:[NSArray arrayWithObject:value] forKey:[self.pickListKeys objectAtIndex:[initialValues indexOfObjectIdenticalTo:value]]];
+            [_pickListSelectedValues setObject:[NSArray arrayWithObject:value] forKey:[self.pickListKeys objectAtIndex:[initialValues indexOfObjectIdenticalTo:value]]];
         }
     }
-    return _pickListValues;
+    return _pickListSelectedValues;
+}
+
+- (NSMutableDictionary *)pickListSelectedKeys
+{
+    if (!pickListSelectedKeys) {
+        pickListSelectedKeys = [[NSMutableDictionary alloc] init];
+    }
+    return pickListSelectedKeys;
 }
 
 #pragma mark - Initialisation
@@ -266,7 +276,7 @@
 
 - (NSString *)stringFromPickListValuesAtIndex:(NSInteger)index
 {
-    NSArray *selectedValueStrings = [self.pickListValues objectForKey:[self.pickListKeys objectAtIndex:index]];
+    NSArray *selectedValueStrings = [self.pickListSelectedValues objectForKey:[self.pickListKeys objectAtIndex:index]];
     NSString *selectedValueString = [selectedValueStrings objectAtIndex:0];
     for (int i = 1; i < [selectedValueStrings count]; i++) {
         selectedValueString = [selectedValueString stringByAppendingFormat:@", %@", [selectedValueStrings objectAtIndex:i]];
@@ -469,21 +479,25 @@
 #pragma mark - Selected Values
 - (void) selectedPickListKeys:(NSArray *)selectedKeys forPickListType:(NSString *)pickListType;
 {
+    //First store the selected keys, these will be uploaded to the server
+    [self.pickListSelectedKeys setValue:selectedKeys forKey:pickListType];
+    //Also need the values associated with the selected keys to update the table view to show selections
+    //First get all the values associated with the pick list type
     NSDictionary *allValues;
-    if ([pickListType isEqualToString:self.pickListKeys[0]]) {
+    if ([pickListType isEqualToString:PL_ELECTORATES]) {
         allValues = self.electorates;
-    } else if ([pickListType isEqualToString:self.pickListKeys[1]]){
+    } else if ([pickListType isEqualToString:PL_DELIVERY]){
         allValues = self.deliveryTimes;
-    } else if ([pickListType isEqualToString:self.pickListKeys[2]]){
+    } else if ([pickListType isEqualToString:PL_PARTY]){
         allValues = self.parties;
-    } else if ([pickListType isEqualToString:self.pickListKeys[3]]){
+    } else if ([pickListType isEqualToString:PL_ATTACKEDPARTIES]){
         allValues = self.parties;
-    } else if ([pickListType isEqualToString:self.pickListKeys[4]]){
+    } else if ([pickListType isEqualToString:PL_CATEGORIES]){
         allValues = self.categories;
     }
-    NSArray *selectedValues = [allValues objectsForKeys:selectedKeys notFoundMarker:@"Not found"];
-    [self.pickListValues setObject:selectedValues forKey:pickListType];
-    [self.tableView reloadData];
+    NSArray *selectedValues = [allValues objectsForKeys:selectedKeys notFoundMarker:@"Not found"]; //Extract only the selected values
+    [self.pickListSelectedValues setObject:selectedValues forKey:pickListType]; //Store
+    [self.tableView reloadData]; //Update display
 }
 
 - (IBAction)saveLeafletButton:(id)sender {
@@ -500,10 +514,9 @@
                              @"txtTitle": self.leafletTitle.text,
                              @"txtDescription": self.leafletTranscript.text,
                              @"txtPostcode": self.leafletPostcode.text,
-                             //These are all wrong
-                             //@"ddlConstituency": [[self.electorates allKeysForObject:self.pickListKeys[0]] objectAtIndex:0],
-                             //@"ddlDelivered": [[self.deliveryTimes allKeysForObject:self.pickListKeys[1]] objectAtIndex:0],
-                             //@"ddlPartyBy": [[self.parties allKeysForObject:self.pickListKeys[2]] objectAtIndex:0],
+                             @"ddlConstituency": [self getStringOfSelectedKeyForPickListType:PL_ELECTORATES],
+                             @"ddlDelivered": [self getStringOfSelectedKeyForPickListType:PL_DELIVERY],
+                             @"ddlPartyBy": [self getStringOfSelectedKeyForPickListType:PL_PARTY],
                              //Method for checkboxes is more difficult to implement
                              //@"chkPartyAttack": self.pickListKeys[3],
                              //@"chkCategory": self.pickListKeys[4],
@@ -520,6 +533,18 @@
         NSLog(@"%@", @"Failure");
     }];
     [httpClient enqueueHTTPRequestOperation:operation];
+}
+
+- (NSString *)getStringOfSelectedKeyForPickListType:(NSString *)pickListType
+{
+    //This method is only for pick list types with only 1 key expected
+    if ([pickListType isEqualToString:PL_PARTY] || [pickListType isEqualToString:PL_ELECTORATES] || [pickListType isEqualToString:PL_DELIVERY]) {
+        NSArray *selectedKey = [self.pickListSelectedKeys valueForKey:pickListType];
+        NSString *selectedKeyString = [selectedKey objectAtIndex:0];
+        return selectedKeyString;
+    } else {
+        return @""; //probably should make this error more obvious
+    }
 }
 
 

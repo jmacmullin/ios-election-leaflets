@@ -6,6 +6,12 @@
 //  Copyright (c) 2013 Jake MacMullin. All rights reserved.
 //
 
+#define PL_ELECTORATES @"Electorates"
+#define PL_DELIVERY @"Delivery"
+#define PL_PARTY @"Responible Party"
+#define PL_ATTACKEDPARTIES @"Attacked Parties"
+#define PL_CATEGORIES @"Categories"
+
 #import <UIKit/UIKit.h>
 
 @interface DetailsViewController : UITableViewController <UITextViewDelegate, UITextFieldDelegate>
