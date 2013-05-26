@@ -513,8 +513,8 @@
 - (IBAction)saveLeafletButton:(id)sender {
     //Perform some validation
     NSString *saveLeafletPath = [@"addinfo.php?key=" stringByAppendingString:uploadKey];
-    NSURL *url = [NSURL URLWithString:@"http://dev.electionleaflets.local:8080"]; //for development only
-    //NSURL *url = [NSURL URLWithString:@"http://www.electionleaflets.org.au/"];
+    //NSURL *url = [NSURL URLWithString:@"http://dev.electionleaflets.local:8080"]; //for development only
+    NSURL *url = [NSURL URLWithString:@"http://www.electionleaflets.org.au/"];
     AFHTTPClient *httpClient = [[AFHTTPClient alloc] initWithBaseURL:url];
     NSDictionary *params = @{
                              @"_is_postback": @"1",
