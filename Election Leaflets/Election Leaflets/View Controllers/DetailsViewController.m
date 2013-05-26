@@ -45,6 +45,10 @@
 @property (nonatomic, strong) NSDictionary *categories;
 @property (nonatomic, strong) NSArray *categoriesOrderedKeys;
 
+//Uploading
+@property (nonatomic, strong) UIAlertView *uploadingInProgressView;
+@property (nonatomic, strong) NSString *successfulSaveTitle;
+
 @end
 
 @implementation DetailsViewController
@@ -64,6 +68,8 @@
 @synthesize categories;
 @synthesize categoriesOrderedKeys; 
 @synthesize pickListSelectedKeys;
+@synthesize uploadingInProgressView;
+@synthesize successfulSaveTitle;
 
 - (NSArray *) pickListKeys
 {
@@ -163,6 +169,8 @@
     [self setupDeliveryTimes];
     [self setupParties];
     [self setupCategories];
+    
+    self.successfulSaveTitle = @"Leaflet Saved!";
 
 }
 
@@ -500,6 +508,8 @@
     [self.tableView reloadData]; //Update display
 }
 
+#pragma mark - Saving Leaflet
+
 - (IBAction)saveLeafletButton:(id)sender {
     //Perform some validation
     NSString *saveLeafletPath = [@"addinfo.php?key=" stringByAppendingString:uploadKey];
@@ -512,27 +522,47 @@
                              @"_postback_command": @"",
                              @"_postback_arguement": @"",
                              @"txtTitle": self.leafletTitle.text,
-                             @"txtDescription": self.leafletTranscript.text,
+                             @"txtDescription": [self getTranscriptText],
                              @"txtPostcode": self.leafletPostcode.text,
                              @"ddlConstituency": [self getStringOfSelectedKeyForPickListType:PL_ELECTORATES],
                              @"ddlDelivered": [self getStringOfSelectedKeyForPickListType:PL_DELIVERY],
                              @"ddlPartyBy": [self getStringOfSelectedKeyForPickListType:PL_PARTY],
-                             //Method for checkboxes is more difficult to implement
-                             //@"chkPartyAttack": self.pickListKeys[3],
-                             //@"chkCategory": self.pickListKeys[4],
-                             @"txtTags": self.leafletTags.text,
+                             @"txtTags": [self getTagsText],
                              @"txtName": self.submitterName.text,
                              @"txtEmail": self.submitterEmail.text,
                              };
+    params = [self addMultipleSelectedKeysToDictionary:params forPickListType:PL_ATTACKEDPARTIES];
+    params = [self addMultipleSelectedKeysToDictionary:params forPickListType:PL_CATEGORIES];
     NSMutableURLRequest *request = [httpClient requestWithMethod:@"POST" path:saveLeafletPath parameters:params];
     AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
     [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
-        NSLog(@"%@", @"Success");
-        NSLog(@"%@", [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding]);
+        //NSLog(@"%@", @"Success");
+        //NSLog(@"%@", [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding]);
+        [self handleLeafletSaveHTTPSuccess:responseObject];
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        NSLog(@"%@", @"Failure");
+        //NSLog(@"%@", @"Failure");
+        [self handleLeafletSaveHTTPFailure];
     }];
     [httpClient enqueueHTTPRequestOperation:operation];
+    [self displayUploadingInProgressMessage];
+}
+
+- (NSString *)getTranscriptText
+{
+    if ([self.leafletTranscript.text isEqualToString:self.defaultTranscriptTextViewText]) {
+        return @"";
+    } else {
+        return self.leafletTranscript.text;
+    }
+}
+
+- (NSString *)getTagsText
+{
+    if ([self.leafletTags.text isEqualToString:self.defaultTagsTextViewText]) {
+        return @"";
+    } else {
+        return self.leafletTags.text;
+    }
 }
 
 - (NSString *)getStringOfSelectedKeyForPickListType:(NSString *)pickListType
@@ -540,12 +570,103 @@
     //This method is only for pick list types with only 1 key expected
     if ([pickListType isEqualToString:PL_PARTY] || [pickListType isEqualToString:PL_ELECTORATES] || [pickListType isEqualToString:PL_DELIVERY]) {
         NSArray *selectedKey = [self.pickListSelectedKeys valueForKey:pickListType];
-        NSString *selectedKeyString = [selectedKey objectAtIndex:0];
+        NSString *selectedKeyString = @"";
+        if (selectedKey != nil && [selectedKey count] != 0) {
+            selectedKeyString = [selectedKey objectAtIndex:0];
+        }
         return selectedKeyString;
     } else {
         return @""; //probably should make this error more obvious
     }
 }
 
+- (NSDictionary *)addMultipleSelectedKeysToDictionary:(NSDictionary *)oldParams forPickListType:(NSString *)pickListType
+{
+    NSDictionary *newParams;
+    if ([pickListType isEqualToString:PL_ATTACKEDPARTIES] || [pickListType isEqualToString:PL_CATEGORIES]) {
+        NSString *uploadKeyBaseString;
+        if ([pickListType isEqualToString:PL_ATTACKEDPARTIES]) {
+            uploadKeyBaseString = @"chkPartyAttack_";
+        } else {
+            uploadKeyBaseString = @"chkCategory_";
+        }
+        NSMutableDictionary *mutableDictionary = [oldParams mutableCopy];
+        NSArray *selectedKeys = [self.pickListSelectedKeys valueForKey:pickListType];
+        for (NSString *key in selectedKeys) {
+            NSString *uploadKeyString = [uploadKeyBaseString stringByAppendingString:key];
+            [mutableDictionary setValue:key forKey:uploadKeyString];
+        }
+        newParams = [mutableDictionary copy];
+    } else {
+        newParams = oldParams;
+    }
+    return newParams;
+}
+
+- (void) handleLeafletSaveHTTPSuccess:(NSData *)response
+{
+    //handle HTTP success could be either successful upload or form validation response
+    [self.uploadingInProgressView dismissWithClickedButtonIndex:0 animated:YES];
+    TFHpple *responseDoc = [[TFHpple alloc] initWithHTMLData:response];
+    TFHppleElement *warnings = [responseDoc searchWithXPathQuery:@"//div[@id='divWarning']"][0];
+    //NSLog(@"%@", [warnings description]);
+    if ([warnings.children count] > 1) {
+        //Invalid form
+        //NSLog(@"%@", @"Invalid Form Submitted");
+        TFHppleElement *warningsList = warnings.children[1];
+        NSString *firstWarningContent = warningsList.firstChild.firstChild.content;
+        //NSLog(@"%@", firstWarningContent);
+        UIAlertView *warning = [[UIAlertView alloc] initWithTitle:firstWarningContent
+                                                        message:nil
+                                                       delegate:self
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [warning show];
+    } else {
+        //Valid form successfully saved
+        //NSLog(@"%@", @"Successfully saved leaflet");
+        UIAlertView *saveSuccess = [[UIAlertView alloc] initWithTitle:self.successfulSaveTitle
+                                                              message:nil
+                                                             delegate:self
+                                                    cancelButtonTitle:@"OK"
+                                                    otherButtonTitles:nil];
+        [saveSuccess show];
+    }
+}
+
+- (void) handleLeafletSaveHTTPFailure
+{
+    [self.uploadingInProgressView dismissWithClickedButtonIndex:0 animated:YES];
+    UIAlertView *errorMsg = [[UIAlertView alloc] initWithTitle:@"A network error occured,\nplease try again..."
+                                                       message:nil
+                                                      delegate:self
+                                             cancelButtonTitle:@"OK"
+                                             otherButtonTitles:nil];
+    [errorMsg show];
+}
+
+-(void) displayUploadingInProgressMessage
+{
+    self.uploadingInProgressView = [[UIAlertView alloc] initWithTitle:@"\nSaving Leaflet\nPlease Wait..."
+                                                              message:nil
+                                                             delegate:self
+                                                    cancelButtonTitle:nil
+                                                    otherButtonTitles: nil];
+    [self.uploadingInProgressView show];
+    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    indicator.center = CGPointMake(self.uploadingInProgressView.bounds.size.width / 2, self.uploadingInProgressView.bounds.size.height - 50);
+    [indicator startAnimating];
+    [self.uploadingInProgressView addSubview:indicator];
+}
+
+
+-(void) alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    if ([alertView.title isEqualToString:self.successfulSaveTitle]) {
+        UIViewController *leafletView = [self.tabBarController.viewControllers objectAtIndex:0];//get the leaflet view controller
+        self.tabBarController.selectedViewController = leafletView;
+        [self.navigationController popToRootViewControllerAnimated:NO];
+    }
+}
 
 @end

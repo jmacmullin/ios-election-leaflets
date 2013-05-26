@@ -14,7 +14,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DetailsViewController : UITableViewController <UITextViewDelegate, UITextFieldDelegate>
+@interface DetailsViewController : UITableViewController <UITextViewDelegate, UITextFieldDelegate, UIAlertViewDelegate>
 
 //User inputs
 @property (weak, nonatomic) IBOutlet UITextField *leafletTitle;

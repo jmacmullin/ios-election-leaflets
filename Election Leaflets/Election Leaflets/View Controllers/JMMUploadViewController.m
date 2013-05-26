@@ -69,6 +69,13 @@
     [[self.uploadImagesButton superview] setHidden:YES]; //hide the upload button until pictures are selected
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self.tableView reloadData];
+    [self.tableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
+}
+
 - (void)showUploadButton
 {
     [[self.uploadImagesButton superview] setHidden:NO];
@@ -112,8 +119,7 @@
 }
 
 - (IBAction)uploadImagesAction:(id)sender {
-    //For testing only
-    //[self performSegueWithIdentifier:@"imagesUploadedSegue" sender:self];
+    //[self performSegueWithIdentifier:@"imagesUploadedSegue" sender:self]; //for development only
     [self displayUploadingInProgressMessage];
     [self startImageUploadRequests];
 }
@@ -172,11 +178,12 @@
         keyRange.location = keyRange.location + keyRange.length;
         keyRange.length = [locationString length] - keyRange.location;
         self.uploadedImagesKey = [locationString substringWithRange:keyRange];
-        NSLog(@"Sucess Occurred");
+        //NSLog(@"Sucess Occurred");
         [self.uploadingInProgressView dismissWithClickedButtonIndex:0 animated:YES];
+        [self.capturedImages removeAllObjects];
         [self performSegueWithIdentifier:@"imagesUploadedSegue" sender:self];
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        NSLog(@"Failure occured on POST request");
+        //NSLog(@"Failure occured on POST request");
         [self.uploadingInProgressView dismissWithClickedButtonIndex:0 animated:YES];
         [self displayUploadErrorMessage];
     }];

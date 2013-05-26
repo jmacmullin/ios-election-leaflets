@@ -95,7 +95,7 @@
         NSString *selectedKey = [self.orderedKeys objectAtIndex:indexPath.row];
         DetailsViewController *detailsVC = [self.navigationController.viewControllers objectAtIndex:[self.navigationController.viewControllers count] - 2];
         [detailsVC selectedPickListKeys:[NSArray arrayWithObject:selectedKey] forPickListType:self.title];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_current_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_current_queue(), ^{
             [self.navigationController popViewControllerAnimated:YES];
         });
     }
