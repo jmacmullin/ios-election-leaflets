@@ -44,6 +44,12 @@
 		2312AF9F17289B5E00781129 /* nav_bar_bg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2312AF9D17289B5E00781129 /* nav_bar_bg@2x.png */; };
 		2312AFA81728A14B00781129 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2312AFA61728A13D00781129 /* MobileCoreServices.framework */; };
 		2312AFA91728A14B00781129 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2312AFA41728A13700781129 /* SystemConfiguration.framework */; };
+		7980E4C81734A4F100232951 /* DetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7980E4C71734A4F000232951 /* DetailsViewController.m */; };
+		7995B320172B97A50006C534 /* UploadPictureCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7995B31F172B97A50006C534 /* UploadPictureCell.m */; };
+		79BB1075172C125B00BAE5FB /* instructions_nocamera.png in Resources */ = {isa = PBXBuildFile; fileRef = 79BB1073172C125B00BAE5FB /* instructions_nocamera.png */; };
+		79BB1076172C125B00BAE5FB /* instructions.png in Resources */ = {isa = PBXBuildFile; fileRef = 79BB1074172C125B00BAE5FB /* instructions.png */; };
+		79E09B771737AEEB00857C3F /* PickListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 79E09B761737AEEB00857C3F /* PickListViewController.m */; };
+		79E09B801737B21A00857C3F /* LeafletButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 79E09B7F1737B21A00857C3F /* LeafletButton.m */; };
 		83D7F01A2E234BA3AA4D307B /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CBA53AFE38B43F3804010E0 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -97,6 +103,16 @@
 		2312AFA41728A13700781129 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		2312AFA61728A13D00781129 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		6CBA53AFE38B43F3804010E0 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		7980E4C61734A4F000232951 /* DetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DetailsViewController.h; path = "View Controllers/DetailsViewController.h"; sourceTree = "<group>"; };
+		7980E4C71734A4F000232951 /* DetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DetailsViewController.m; path = "View Controllers/DetailsViewController.m"; sourceTree = "<group>"; };
+		7995B31E172B97A50006C534 /* UploadPictureCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UploadPictureCell.h; path = Views/UploadPictureCell.h; sourceTree = "<group>"; };
+		7995B31F172B97A50006C534 /* UploadPictureCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UploadPictureCell.m; path = Views/UploadPictureCell.m; sourceTree = "<group>"; };
+		79BB1073172C125B00BAE5FB /* instructions_nocamera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = instructions_nocamera.png; path = Images/instructions_nocamera.png; sourceTree = "<group>"; };
+		79BB1074172C125B00BAE5FB /* instructions.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = instructions.png; path = Images/instructions.png; sourceTree = "<group>"; };
+		79E09B751737AEEB00857C3F /* PickListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PickListViewController.h; path = "View Controllers/PickListViewController.h"; sourceTree = "<group>"; };
+		79E09B761737AEEB00857C3F /* PickListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PickListViewController.m; path = "View Controllers/PickListViewController.m"; sourceTree = "<group>"; };
+		79E09B7E1737B21A00857C3F /* LeafletButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LeafletButton.h; path = Views/LeafletButton.h; sourceTree = "<group>"; };
+		79E09B7F1737B21A00857C3F /* LeafletButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LeafletButton.m; path = Views/LeafletButton.m; sourceTree = "<group>"; };
 		A46E678958434D589DCD99E5 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -190,6 +206,10 @@
 				2312AF97172790D000781129 /* JMMUploadViewController.m */,
 				2312AF99172790E100781129 /* JMMAboutViewController.h */,
 				2312AF9A172790E100781129 /* JMMAboutViewController.m */,
+				7980E4C61734A4F000232951 /* DetailsViewController.h */,
+				7980E4C71734A4F000232951 /* DetailsViewController.m */,
+				79E09B751737AEEB00857C3F /* PickListViewController.h */,
+				79E09B761737AEEB00857C3F /* PickListViewController.m */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -218,6 +238,10 @@
 			children = (
 				2312AF6B1725514800781129 /* JMMLeafletCell.h */,
 				2312AF6C1725514800781129 /* JMMLeafletCell.m */,
+				7995B31E172B97A50006C534 /* UploadPictureCell.h */,
+				7995B31F172B97A50006C534 /* UploadPictureCell.m */,
+				79E09B7E1737B21A00857C3F /* LeafletButton.h */,
+				79E09B7F1737B21A00857C3F /* LeafletButton.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -225,6 +249,8 @@
 		2312AF711726B38200781129 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				79BB1073172C125B00BAE5FB /* instructions_nocamera.png */,
+				79BB1074172C125B00BAE5FB /* instructions.png */,
 				2312AF9C17289B5E00781129 /* nav_bar_bg.png */,
 				2312AF9D17289B5E00781129 /* nav_bar_bg@2x.png */,
 				2312AF86172790B400781129 /* info_icon_selected.png */,
@@ -324,6 +350,8 @@
 				2312AF95172790B400781129 /* upload_icon@2x.png in Resources */,
 				2312AF9E17289B5E00781129 /* nav_bar_bg.png in Resources */,
 				2312AF9F17289B5E00781129 /* nav_bar_bg@2x.png in Resources */,
+				79BB1075172C125B00BAE5FB /* instructions_nocamera.png in Resources */,
+				79BB1076172C125B00BAE5FB /* instructions.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -372,6 +400,10 @@
 				2312AF6D1725514800781129 /* JMMLeafletCell.m in Sources */,
 				2312AF98172790D000781129 /* JMMUploadViewController.m in Sources */,
 				2312AF9B172790E100781129 /* JMMAboutViewController.m in Sources */,
+				7995B320172B97A50006C534 /* UploadPictureCell.m in Sources */,
+				7980E4C81734A4F100232951 /* DetailsViewController.m in Sources */,
+				79E09B771737AEEB00857C3F /* PickListViewController.m in Sources */,
+				79E09B801737B21A00857C3F /* LeafletButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
