@@ -92,7 +92,7 @@
         _pickListSelectedValues = [[NSMutableDictionary alloc] init];
         NSArray *initialValues = @[@"Which electorate was the leaflet delivered to?",
                                    @"When was the leaflet delivered?",
-                                   @"Which party is responsible for the leaflet?",
+                                   @"Which party is responsible for the leaflet?*",
                                    @"Which parties (if any) does the leaflet criticise?",
                                    @"Which categories (if any) best describe this leaflet?"
                                    ];
